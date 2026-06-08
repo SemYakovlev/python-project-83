@@ -4,7 +4,7 @@
 <div class="container-lg mt-3">
     <h1>Сайт: {{ url.name }}</h1>
 
-    <div class="table-responsive">
+    <div class="table-responsive mb-4">
         <table class="table table-bordered table-hover mt-3" data-test="url">
             <tbody>
                 <tr>
@@ -22,5 +22,39 @@
             </tbody>
         </table>
     </div>
+
+    <h2 class="mt-5 mb-3">Проверки</h2>
+
+<form method="post" action="{{ url_for('check_url', id=url.id) }}">
+    <input type="submit" class="btn btn-primary mb-3" value="Запустить проверку">
+</form>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover" data-test="checks">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Код ответа</th>
+                <th>h1</th>
+                <th>title</th>
+                <th>description</th>
+                <th>Дата создания</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for check in checks %}
+            <tr>
+                <td>{{ check[0] }}</td>
+                <td>{{ check[1] if check[1] else '' }}</td>
+                <td>{{ check[2] if check[2] else '' }}</td>
+                <td>{{ check[3] if check[3] else '' }}</td>
+                <td>{{ check[4] if check[4] else '' }}</td>
+                <td>{{ check[5].strftime('%Y-%m-%d') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
 </div>
 {% endblock %}

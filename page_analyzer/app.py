@@ -55,6 +55,17 @@ def urls_get():
     return render_template('urls.html', urls=urls)
 
 
+@app.post('/urls/<int:id>/checks')
+def check_url(id):
+    try:
+        db.add_check(id)
+        flash('Страница успешно проверена', 'success')
+    except Exception:
+        flash('Произошла ошибка при проверке', 'danger')
+
+    return redirect(url_for('show_url', id=id))
+
+
 @app.route('/urls/<int:id>')
 def show_url(id):
     url_data = db.get_url_by_id(id)
@@ -67,4 +78,6 @@ def show_url(id):
         'name': url_data[1],
         'created_at': url_data[2]
     }
-    return render_template('url_detail.html', url=url_dict)
+    checks = db.get_checks(id)
+
+    return render_template('url_detail.html', url=url_dict, checks=checks)

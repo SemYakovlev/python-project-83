@@ -9,7 +9,16 @@ def connect_db():
 def get_urls():
     with connect_db() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, name, created_at FROM urls ORDER BY id;")
+            cur.execute("""
+                SELECT DISTINCT ON (urls.id)
+                    urls.id,
+                    urls.name,
+                    url_checks.created_at,
+                    url_checks.status_code
+                FROM urls
+                LEFT JOIN url_checks ON urls.id = url_checks.url_id
+                ORDER BY urls.id DESC, urls_checks.created_at DESC;
+            """)
             return cur.fetchall()
 
 
@@ -37,3 +46,22 @@ def add_url(name):
             url_id = cur.fetchone()[0]
             conn.commit()
             return url_id
+
+
+def get_checks(url_id):
+    with connect_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT id, status_code, h1, title, description, created_at 
+                FROM url_checks 
+                WHERE url_id = %s 
+                ORDER BY id DESC;
+            """, (url_id,))
+            return cur.fetchall()
+
+def add_check(url_id):
+    with connect_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("INSERT INTO url_checks (url_id, created_at) VALUES (%s, %s);",
+                (url_id, datetime.now()))
+            conn.commit()
