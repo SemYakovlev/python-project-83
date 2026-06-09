@@ -17,7 +17,7 @@ def get_urls():
                     url_checks.status_code
                 FROM urls
                 LEFT JOIN url_checks ON urls.id = url_checks.url_id
-                ORDER BY urls.id DESC, urls_checks.created_at DESC;
+                ORDER BY urls.id DESC, url_checks.created_at DESC;
             """)
             return cur.fetchall()
 
