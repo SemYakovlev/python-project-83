@@ -59,9 +59,9 @@ def get_checks(url_id):
             """, (url_id,))
             return cur.fetchall()
 
-def add_check(url_id):
+def add_check(url_id, status_code):
     with connect_db() as conn:
         with conn.cursor() as cur:
-            cur.execute("INSERT INTO url_checks (url_id, created_at) VALUES (%s, %s);",
-                (url_id, datetime.now()))
+            cur.execute("INSERT INTO url_checks (url_id, status_code, created_at) VALUES (%s, %s, %s);",
+                (url_id, status_code, datetime.now()))
             conn.commit()

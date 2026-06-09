@@ -1,5 +1,7 @@
 import os
 import validators
+import requests
+from requests.exceptions import RequestException
 from flask import Flask, render_template, request, redirect, url_for, flash
 from dotenv import load_dotenv
 from urllib.parse import urlparse
@@ -57,10 +59,19 @@ def urls_get():
 
 @app.post('/urls/<int:id>/checks')
 def check_url(id):
+    url_data = db.get_url_by_id(id)
+    if not url_data:
+        return render_template('errors/404.html'), 404
+    url_name = url_data[1]
+
     try:
-        db.add_check(id)
+        response = requests.get(url_name, timeout=5)
+        response.raise_for_status()
+        status_code = response.status_code
+
+        db.add_check(id, status_code)
         flash('Страница успешно проверена', 'success')
-    except Exception:
+    except RequestException:
         flash('Произошла ошибка при проверке', 'danger')
 
     return redirect(url_for('show_url', id=id))
