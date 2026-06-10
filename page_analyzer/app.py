@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from urllib.parse import urlparse
 
 from page_analyzer import db
+from page_analyzer.parser import parse_html
 
 load_dotenv()
 
@@ -69,8 +70,12 @@ def check_url(id):
         response.raise_for_status()
         status_code = response.status_code
 
-        db.add_check(id, status_code)
+        h1, title, description = parse_html(response.text)
+
+
+        db.add_check(id, status_code, h1, title, description)
         flash('Страница успешно проверена', 'success')
+
     except RequestException:
         flash('Произошла ошибка при проверке', 'danger')
 
